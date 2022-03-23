@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
-import { GameState } from '../types'
-import Socket from '../utils/websocket'
+import { CloseState, GameState } from '../types'
+import ws from '../utils/websocket'
 import defaultState from '../state-mock.json'
 import { isEqual } from 'lodash'
 
@@ -32,38 +32,68 @@ const keysToEbitenKeyCodes: Record<typeof allowedKeys[number], number> = {
 const useGameState = () => {
   const gameStateRef = useRef<GameState>(defaultState)
 
+  const setup = () => {
+    // timeout to make the apperance nicer as if you are connecting to play
+
+    ws.connect()
+    document.addEventListener('keydown', ({ key }) => {
+      if (allowedKeys.includes(key as typeof allowedKeys[number])) {
+        ws.send({
+          action: KeyState.DOWN,
+          key: keysToEbitenKeyCodes[key as typeof allowedKeys[number]],
+        })
+      }
+    })
+
+    document.addEventListener('keyup', ({ key }) => {
+      if (allowedKeys.includes(key as typeof allowedKeys[number])) {
+        ws.send({
+          action: KeyState.UP,
+          key: keysToEbitenKeyCodes[key as typeof allowedKeys[number]],
+        })
+      }
+    })
+
+    ws.onMessage<string>((event) => {
+      const data: GameState | CloseState = JSON.parse(event.data)
+      if ((data as CloseState).Text) {
+        gameStateRef.current.Placeholder = `${(data as CloseState).Text}`
+      } else if (!isEqual(gameStateRef.current, data as GameState)) {
+        gameStateRef.current = data as GameState
+      }
+    })
+
+    ws.onListener('error', (err) => {
+      console.log(err)
+      gameStateRef.current.Placeholder =
+        'Something wrong happened!\n Refresh site'
+    })
+  }
+
+  const mockLoadingState = () =>
+    new Promise((resolve) => {
+      const timer = window.setInterval(() => {
+        const { Placeholder } = gameStateRef.current
+
+        if (
+          Placeholder.includes('Connecting') &&
+          !Placeholder.includes('...')
+        ) {
+          gameStateRef.current.Placeholder = `${Placeholder}.`
+          return
+        } else if (Placeholder.includes('Connecting...')) {
+          gameStateRef.current.Placeholder = `Game ready!`
+        } else {
+          console.log(gameStateRef.current.Placeholder)
+          resolve(timer)
+
+          window.clearInterval(timer)
+        }
+      }, 1000)
+    })
   useEffect(() => {
-    setTimeout(() => {
-      // timeout to make the apperance nicer as if you are connecting to play
-      const socket = new Socket()
-
-      document.addEventListener('keydown', ({ key }) => {
-        if (allowedKeys.includes(key as typeof allowedKeys[number])) {
-          socket.send({
-            action: KeyState.DOWN,
-            key: keysToEbitenKeyCodes[key as typeof allowedKeys[number]],
-          })
-        }
-      })
-
-      document.addEventListener('keyup', ({ key }) => {
-        if (allowedKeys.includes(key as typeof allowedKeys[number])) {
-          socket.send({
-            action: KeyState.UP,
-            key: keysToEbitenKeyCodes[key as typeof allowedKeys[number]],
-          })
-        }
-      })
-
-      socket.onMessage<string>((event) => {
-        const data: GameState = JSON.parse(event.data)
-        if (!isEqual(gameStateRef.current, data)) {
-          gameStateRef.current = data
-        }
-      })
-    }, 1500)
+    mockLoadingState().then(() => setup())
   }, [])
-
   return gameStateRef
 }
 

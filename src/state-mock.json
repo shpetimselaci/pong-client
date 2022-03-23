@@ -27,5 +27,6 @@
   "Level": 0,
   "MaxScore": 11,
   "Ws": {},
-  "loading": true
+  "TryAgain": false,
+  "Placeholder": "Connecting"
 }

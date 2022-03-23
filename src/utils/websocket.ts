@@ -1,17 +1,15 @@
 class Socket {
-  private ws: WebSocket
+  private ws?: WebSocket
 
-  constructor() {
-    this.ws = new WebSocket('ws://localhost:8080')
+  connect() {
+    this.ws = new WebSocket('wss://79f7-185-173-204-68.eu.ngrok.io')
   }
 
   send<T>(message: T) {
-    if (this.ws.CONNECTING) {
+    if (this.ws?.CONNECTING) {
       throw new Error('Socket is connecting')
     }
-    this.ws.send(JSON.stringify(message))
-
-    this.ws.addEventListener('message', function (event) {})
+    this.ws?.send(JSON.stringify(message))
   }
 
   onListener(
@@ -21,12 +19,12 @@ class Socket {
       ev: Event | CloseEvent | MessageEvent<any>
     ) => any
   ) {
-    this.ws.addEventListener(message, listener)
+    this.ws?.addEventListener(message, listener)
   }
 
   onMessage<T>(onMessageFn: (event: MessageEvent<T>) => void) {
-    this.ws.addEventListener('message', onMessageFn)
+    this.ws?.addEventListener('message', onMessageFn)
   }
 }
 
-export default Socket
+export default new Socket()

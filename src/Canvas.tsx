@@ -33,7 +33,7 @@ const GamePlayStateTexts: Partial<Record<GamePlayState, string>> = {
   [GamePlayState.GameOverState]: 'GAME OVER / PRESS SPACE to restart',
 }
 
-const drawGameState = (ctx: CanvasRenderingContext2D, gameState: GameState) => {
+const drawPlayState = (ctx: CanvasRenderingContext2D, gameState: GameState) => {
   const textToRender = GamePlayStateTexts[gameState.State as GamePlayState]
   if (textToRender) {
     ctx.font = '20px Arial'
@@ -43,7 +43,7 @@ const drawGameState = (ctx: CanvasRenderingContext2D, gameState: GameState) => {
       textToRender,
       ctx.canvas.width / 2 - textToRender.length * 5,
       200,
-      400
+      840
     )
   }
 }
@@ -65,18 +65,26 @@ const drawStats = (
   ctx.fillText(`YVelocity: ${gameState.Ball.XVelocity}`, 320, 80, 400)
 }
 
-const drawLoadingScreen = (ctx: CanvasRenderingContext2D) => {
+const drawGameState = (ctx: CanvasRenderingContext2D, gameState: GameState) => {
   ctx.font = '30px monospace'
   ctx.fillStyle = 'whitesmoke'
-  const mod = new Date().getSeconds() % 5
-  const loadingText = `Connecting${new Array(mod).fill('').join('.')}`
   ctx.fillText(
-    loadingText,
-    // placed mod || 1 to not affect spacing when rendering the dots
-    ctx.canvas.height / 2 - (loadingText.length - (mod || 1)) * 5,
-    ctx.canvas.width / 2 - 50,
-    400
+    gameState.Placeholder,
+    ctx.canvas.width / 2 - gameState.Placeholder.length * 10,
+    ctx.canvas.height / 2 - 30,
+    700
   )
+
+  if (gameState.TryAgain) {
+    const refreshText = 'Refresh to try again'
+    ctx.fillText(
+      refreshText,
+      // placed mod || 1 to not affect spacing when rendering the dots
+      ctx.canvas.width / 2 - refreshText.length * 10,
+      ctx.canvas.height / 2 - 30 + 100,
+      400
+    )
+  }
 }
 
 const draw = (
@@ -89,8 +97,8 @@ const draw = (
   }
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
-  if (gameState.loading) {
-    drawLoadingScreen(ctx)
+  if (gameState.Placeholder) {
+    drawGameState(ctx, gameState)
     return
   }
   const now = performance.now()
@@ -104,7 +112,7 @@ const draw = (
   drawBall(ctx, gameState.Ball)
   drawStats(ctx, gameState, currentFps)
 
-  drawGameState(ctx, gameState)
+  drawPlayState(ctx, gameState)
 }
 
 const Canvas: React.FC<
