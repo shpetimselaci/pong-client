@@ -1,0 +1,30 @@
+{
+  "State": 0,
+  "Ball": { "X": 400, "Y": 300, "Radius": 10, "XVelocity": 5, "YVelocity": 5 },
+  "Player1": {
+    "X": 50,
+    "Y": 300,
+    "Score": 0,
+    "Speed": 10,
+    "Width": 20,
+    "Height": 100,
+    "Up": 102,
+    "Down": 42,
+    "PlayerName": "player1"
+  },
+  "Player2": {
+    "X": 730,
+    "Y": 300,
+    "Score": 0,
+    "Speed": 10,
+    "Width": 20,
+    "Height": 100,
+    "Up": 32,
+    "Down": 28,
+    "PlayerName": "player2"
+  },
+  "Rally": 0,
+  "Level": 0,
+  "MaxScore": 11,
+  "Ws": {}
+}
