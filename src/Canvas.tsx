@@ -102,12 +102,6 @@ const Canvas: React.FC<
     const context = canvas?.getContext('2d')
     let animationFrameId: number
 
-    const { devicePixelRatio: ratio = 1 } = window
-    if (canvas) {
-      canvas.width = canvas.width * ratio
-      canvas.height = canvas.height * ratio
-      context?.scale(ratio, ratio)
-    }
     //Our draw came here
     const render = () => {
       draw(prevFrameTimeStampRef, gameStateRef.current, context)
