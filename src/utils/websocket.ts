@@ -2,7 +2,7 @@ class Socket {
   private ws: WebSocket
 
   constructor() {
-    this.ws = new WebSocket('wss://b5a2-37-35-67-20.eu.ngrok.io')
+    this.ws = new WebSocket('ws://localhost:8080')
   }
 
   send<T>(message: T) {

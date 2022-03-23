@@ -62,6 +62,9 @@ const drawStats = (
   ctx.fillText(`MaxScore: ${gameState.MaxScore}`, 290, 50, 400)
   ctx.fillText(`Player 1: ${gameState.Player1.Score}`, 510, 50, 400)
   ctx.fillText(`Player 2: ${gameState.Player2.Score}`, 610, 50, 400)
+  ctx.fillText(`PaddleSpeed: ${gameState.Player2.Speed}`, 50, 80, 400)
+  ctx.fillText(`XVelocity: ${gameState.Ball.XVelocity}`, 200, 80, 400)
+  ctx.fillText(`YVelocity: ${gameState.Ball.XVelocity}`, 320, 80, 400)
 }
 
 const draw = (
