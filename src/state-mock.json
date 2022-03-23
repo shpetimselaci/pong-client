@@ -26,5 +26,6 @@
   "Rally": 0,
   "Level": 0,
   "MaxScore": 11,
-  "Ws": {}
+  "Ws": {},
+  "loading": true
 }

@@ -29,36 +29,39 @@ const keysToEbitenKeyCodes: Record<typeof allowedKeys[number], number> = {
   ' ': EbitenKeyCodes.SPACE,
 }
 
-const socket = new Socket()
-
 const useGameState = () => {
   const gameStateRef = useRef<GameState>(defaultState)
 
   useEffect(() => {
-    document.addEventListener('keydown', ({ key }) => {
-      if (allowedKeys.includes(key as typeof allowedKeys[number])) {
-        socket.send({
-          action: KeyState.DOWN,
-          key: keysToEbitenKeyCodes[key as typeof allowedKeys[number]],
-        })
-      }
-    })
+    setTimeout(() => {
+      // timeout to make the apperance nicer as if you are connecting to play
+      const socket = new Socket()
 
-    document.addEventListener('keyup', ({ key }) => {
-      if (allowedKeys.includes(key as typeof allowedKeys[number])) {
-        socket.send({
-          action: KeyState.UP,
-          key: keysToEbitenKeyCodes[key as typeof allowedKeys[number]],
-        })
-      }
-    })
+      document.addEventListener('keydown', ({ key }) => {
+        if (allowedKeys.includes(key as typeof allowedKeys[number])) {
+          socket.send({
+            action: KeyState.DOWN,
+            key: keysToEbitenKeyCodes[key as typeof allowedKeys[number]],
+          })
+        }
+      })
 
-    socket.onMessage<string>((event) => {
-      const data: GameState = JSON.parse(event.data)
-      if (!isEqual(gameStateRef.current, data)) {
-        gameStateRef.current = data
-      }
-    })
+      document.addEventListener('keyup', ({ key }) => {
+        if (allowedKeys.includes(key as typeof allowedKeys[number])) {
+          socket.send({
+            action: KeyState.UP,
+            key: keysToEbitenKeyCodes[key as typeof allowedKeys[number]],
+          })
+        }
+      })
+
+      socket.onMessage<string>((event) => {
+        const data: GameState = JSON.parse(event.data)
+        if (!isEqual(gameStateRef.current, data)) {
+          gameStateRef.current = data
+        }
+      })
+    }, 1500)
   }, [])
 
   return gameStateRef

@@ -1,6 +1,4 @@
 import React, { useRef, useEffect } from 'react'
-
-import useGameState from './hooks/useGameState'
 import { Ball, GamePlayState, GameState, Player } from './types'
 
 let PADDING = 20
@@ -67,6 +65,20 @@ const drawStats = (
   ctx.fillText(`YVelocity: ${gameState.Ball.XVelocity}`, 320, 80, 400)
 }
 
+const drawLoadingScreen = (ctx: CanvasRenderingContext2D) => {
+  ctx.font = '30px monospace'
+  ctx.fillStyle = 'whitesmoke'
+  const mod = new Date().getSeconds() % 5
+  const loadingText = `Connecting${new Array(mod).fill('').join('.')}`
+  ctx.fillText(
+    loadingText,
+    // placed mod || 1 to not affect spacing when rendering the dots
+    ctx.canvas.height / 2 - (loadingText.length - (mod || 1)) * 5,
+    ctx.canvas.width / 2 - 50,
+    400
+  )
+}
+
 const draw = (
   prevFrameTimeStampRef: React.MutableRefObject<number>,
   gameState: GameState,
@@ -75,11 +87,16 @@ const draw = (
   if (!ctx) {
     return
   }
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+  if (gameState.loading) {
+    drawLoadingScreen(ctx)
+    return
+  }
   const now = performance.now()
   const diff = now - prevFrameTimeStampRef.current
   const currentFps = Math.round(1000 / diff)
   prevFrameTimeStampRef.current = now
-  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
   drawBorders(ctx)
   drawPlayerPaddle(ctx, gameState.Player1)
@@ -94,9 +111,10 @@ const Canvas: React.FC<
   React.DetailedHTMLProps<
     React.CanvasHTMLAttributes<HTMLCanvasElement>,
     HTMLCanvasElement
-  >
+  > & { gameStateRef: React.MutableRefObject<GameState> }
 > = (props) => {
-  const gameStateRef = useGameState()
+  const gameStateRef = props.gameStateRef
+
   const canvasRef: React.LegacyRef<HTMLCanvasElement> = useRef(null)
   const prevFrameTimeStampRef = useRef(performance.now())
 
