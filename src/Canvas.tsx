@@ -3,8 +3,8 @@ import React, { useRef, useEffect } from 'react'
 import useGameState from './hooks/useGameState'
 import { Ball, GamePlayState, GameState, Player } from './types'
 
-let MAX_FPS = 60
 let PADDING = 20
+
 const drawPlayerPaddle = (ctx: CanvasRenderingContext2D, paddle: Player) => {
   ctx.fillRect(
     paddle.X + PADDING / 2,
@@ -58,10 +58,33 @@ const drawStats = (
   ctx.font = '16px Arial'
   ctx.fillText(`Fps: ${fps}`, 50, 50, 400)
   ctx.fillText(`Level: ${gameState.Level}`, 110, 50, 400)
-  ctx.fillText(`Rally: ${gameState.Rally}`, 175, 50, 400)
-  ctx.fillText(`MaxScore: ${gameState.MaxScore}`, 240, 50, 400)
-  ctx.fillText(`Player 1: ${gameState.Player1.Score}`, 350, 50, 400)
-  ctx.fillText(`Player 2: ${gameState.Player2.Score}`, 430, 50, 400)
+  ctx.fillText(`Rally: ${gameState.Rally}`, 190, 50, 400)
+  ctx.fillText(`MaxScore: ${gameState.MaxScore}`, 290, 50, 400)
+  ctx.fillText(`Player 1: ${gameState.Player1.Score}`, 510, 50, 400)
+  ctx.fillText(`Player 2: ${gameState.Player2.Score}`, 610, 50, 400)
+}
+
+const draw = (
+  prevFrameTimeStampRef: React.MutableRefObject<number>,
+  gameState: GameState,
+  ctx?: CanvasRenderingContext2D | null
+) => {
+  if (!ctx) {
+    return
+  }
+  const now = performance.now()
+  const diff = now - prevFrameTimeStampRef.current
+  const currentFps = Math.round(1000 / diff)
+  prevFrameTimeStampRef.current = now
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+  drawBorders(ctx)
+  drawPlayerPaddle(ctx, gameState.Player1)
+  drawPlayerPaddle(ctx, gameState.Player2)
+  drawBall(ctx, gameState.Ball)
+  drawStats(ctx, gameState, currentFps)
+
+  drawGameState(ctx, gameState)
 }
 
 const Canvas: React.FC<
@@ -72,40 +95,16 @@ const Canvas: React.FC<
 > = (props) => {
   const gameStateRef = useGameState()
   const canvasRef: React.LegacyRef<HTMLCanvasElement> = useRef(null)
-  const beRef = useRef(performance.now())
-  const draw = (ctx?: CanvasRenderingContext2D | null, frameCount?: number) => {
-    if (!ctx) {
-      return
-    }
-    const now = performance.now()
-    const interval = 1000 / MAX_FPS
-    const diff = now - beRef.current
-    if (diff > interval) {
-      const currentFps = Math.round(1000 / (now - beRef.current))
-      beRef.current = now - (diff % interval)
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-      drawBorders(ctx)
-      drawPlayerPaddle(ctx, gameStateRef.current.Player1)
-      drawPlayerPaddle(ctx, gameStateRef.current.Player2)
-      drawBall(ctx, gameStateRef.current.Ball)
-      drawStats(ctx, gameStateRef.current, currentFps)
-
-      drawGameState(ctx, gameStateRef.current)
-    }
-  }
+  const prevFrameTimeStampRef = useRef(performance.now())
 
   useEffect(() => {
     const canvas = canvasRef.current
     const context = canvas?.getContext('2d')
-    let frameCount = 0
     let animationFrameId: number
 
     //Our draw came here
     const render = () => {
-      frameCount++
-
-      draw(context, frameCount)
+      draw(prevFrameTimeStampRef, gameStateRef.current, context)
       animationFrameId = window.requestAnimationFrame(render)
     }
     render()
@@ -113,6 +112,7 @@ const Canvas: React.FC<
     return () => {
       window.cancelAnimationFrame(animationFrameId)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
