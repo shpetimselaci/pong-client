@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react'
-import { Ball, GamePlayState, GameState, Player } from './types'
+import { Ball, EbitenKeyCodes, GamePlayState, GameState, Player } from './types'
 
 let PADDING = 20
 
@@ -22,6 +22,7 @@ const drawBall = (ctx: CanvasRenderingContext2D, ball: Ball) => {
   ctx.fill()
   ctx.closePath()
 }
+
 const drawBorders = (ctx: CanvasRenderingContext2D) => {
   ctx.strokeRect(0, 0, ctx.canvas.width, ctx.canvas.height)
   ctx.strokeStyle = 'black'
@@ -63,6 +64,13 @@ const drawStats = (
   ctx.fillText(`PaddleSpeed: ${gameState.Player2.Speed}`, 50, 80, 400)
   ctx.fillText(`XVelocity: ${gameState.Ball.XVelocity}`, 200, 80, 400)
   ctx.fillText(`YVelocity: ${gameState.Ball.XVelocity}`, 320, 80, 400)
+
+  ctx.fillText(
+    `Pads: ${gameState.KeyPads.map((key) => EbitenKeyCodes[key]).join()}`,
+    450,
+    80,
+    400
+  )
 }
 
 const drawGameState = (ctx: CanvasRenderingContext2D, gameState: GameState) => {

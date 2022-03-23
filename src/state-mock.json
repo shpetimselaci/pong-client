@@ -28,5 +28,6 @@
   "MaxScore": 11,
   "Ws": {},
   "TryAgain": false,
-  "Placeholder": "Connecting"
+  "Placeholder": "Connecting",
+  "KeyPads": [0]
 }
