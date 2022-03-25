@@ -3,7 +3,7 @@ steps:
     args: ['npm', 'i']
     id: Install
   - name: node:16
-    args: ['npm', 'build']
+    args: ['npm', 'run', 'build']
     id: Build
   - name: 'gcr.io/$PROJECT_ID/gsutil'
     args: ['-m', 'cp', '-R', 'build', 'gs://$REPO_NAME/$COMMIT_SHA']
