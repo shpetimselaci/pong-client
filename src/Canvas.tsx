@@ -3,27 +3,28 @@ import { Ball, EbitenKeyCodes, GamePlayState, GameState, Player } from './types'
 
 let PADDING = 20
 
+let PLAYER_IDENTIFIER_COLOR = '#01FF70'
+
 const drawPlayerPaddle = (
   ctx: CanvasRenderingContext2D,
   paddle: Player,
   playerPaddleKeys: number[]
 ) => {
+  const paddleBelongsToPlayer = [paddle.Down, paddle.Up].includes(
+    playerPaddleKeys?.[0]
+  )
+
+  if (paddleBelongsToPlayer) {
+    ctx.fillStyle = PLAYER_IDENTIFIER_COLOR
+  } else {
+    ctx.fillStyle = '#fff'
+  }
   ctx.fillRect(
     paddle.X + PADDING / 2,
     paddle.Y - paddle.Height / 2 + PADDING / 2,
     paddle.Width,
     paddle.Height
   )
-
-  const paddleBelongsToPlayer =
-    playerPaddleKeys.includes(paddle.Down) ||
-    playerPaddleKeys.includes(paddle.Up)
-
-  if (paddleBelongsToPlayer) {
-    ctx.fillStyle = '#01FF70'
-  } else {
-    ctx.fillStyle = '#fff'
-  }
 }
 
 const drawBall = (ctx: CanvasRenderingContext2D, ball: Ball) => {
@@ -72,18 +73,15 @@ const drawStats = (
   ctx.fillText(`Level: ${gameState.Level}`, 110, 50, 400)
   ctx.fillText(`Rally: ${gameState.Rally}`, 190, 50, 400)
   ctx.fillText(`MaxScore: ${gameState.MaxScore}`, 290, 50, 400)
-  ctx.fillText(`Player 1: ${gameState.Player1.Score}`, 510, 50, 400)
-  ctx.fillText(`Player 2: ${gameState.Player2.Score}`, 610, 50, 400)
+  ctx.fillText(`Player 1: ${gameState.Player1.Score}`, 580, 50, 400)
+  ctx.fillText(`Player 2: ${gameState.Player2.Score}`, 680, 50, 400)
   ctx.fillText(`PaddleSpeed: ${gameState.Player2.Speed}`, 50, 80, 400)
   ctx.fillText(`XVelocity: ${gameState.Ball.XVelocity}`, 200, 80, 400)
   ctx.fillText(`YVelocity: ${gameState.Ball.XVelocity}`, 320, 80, 400)
-
-  ctx.fillText(
-    `Pads: ${gameState.KeyPads.map((key) => EbitenKeyCodes[key]).join()}`,
-    450,
-    80,
-    400
-  )
+  ctx.fillStyle = PLAYER_IDENTIFIER_COLOR
+  ctx.fillRect(735, 64, 20, 20)
+  const padsText = gameState.KeyPads.map((key) => EbitenKeyCodes[key]).join()
+  ctx.fillText(`Your pads: ${padsText}`, 620 - padsText.length * 7, 80, 400)
 }
 
 const drawGameState = (ctx: CanvasRenderingContext2D, gameState: GameState) => {
