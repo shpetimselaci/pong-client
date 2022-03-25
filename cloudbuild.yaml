@@ -1,0 +1,14 @@
+steps:
+  - name: node:16
+    args: ['npm', 'i']
+    id: Install
+  - name: node:16
+    args: ['npm', 'build']
+    id: Build
+  - name: 'gcr.io/$PROJECT_ID/gsutil'
+    args: ['-m', 'cp', '-R', 'build', 'gs://$REPO_NAME/$COMMIT_SHA']
+    id: deploy
+timeout: '1600s'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
