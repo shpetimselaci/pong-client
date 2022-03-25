@@ -6,7 +6,7 @@ steps:
     args: ['npm', 'run', 'build']
     id: Build
   - name: 'gcr.io/cloud-builders/gsutil'
-    args: ['-m', 'cp', '-R', 'build', 'gs://$REPO_NAME']
+    args: ['-m', 'cp', '-R', 'build/*', 'gs://$REPO_NAME']
     id: deploy
 timeout: '1600s'
 
