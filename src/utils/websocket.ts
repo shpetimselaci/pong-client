@@ -2,7 +2,7 @@ class Socket {
   private ws?: WebSocket
 
   connect() {
-    this.ws = new WebSocket('wss://79f7-185-173-204-68.eu.ngrok.io')
+    this.ws = new WebSocket('wss://heroic-vial-345017.appspot.com')
   }
 
   send<T>(message: T) {
