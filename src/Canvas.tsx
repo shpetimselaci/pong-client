@@ -3,14 +3,27 @@ import { Ball, EbitenKeyCodes, GamePlayState, GameState, Player } from './types'
 
 let PADDING = 20
 
-const drawPlayerPaddle = (ctx: CanvasRenderingContext2D, paddle: Player) => {
+const drawPlayerPaddle = (
+  ctx: CanvasRenderingContext2D,
+  paddle: Player,
+  playerPaddleKeys: number[]
+) => {
   ctx.fillRect(
     paddle.X + PADDING / 2,
     paddle.Y - paddle.Height / 2 + PADDING / 2,
     paddle.Width,
     paddle.Height
   )
-  ctx.fillStyle = '#fff'
+
+  const paddleBelongsToPlayer =
+    playerPaddleKeys.includes(paddle.Down) ||
+    playerPaddleKeys.includes(paddle.Up)
+
+  if (paddleBelongsToPlayer) {
+    ctx.fillStyle = '#01FF70'
+  } else {
+    ctx.fillStyle = '#fff'
+  }
 }
 
 const drawBall = (ctx: CanvasRenderingContext2D, ball: Ball) => {
@@ -115,8 +128,8 @@ const draw = (
   prevFrameTimeStampRef.current = now
 
   drawBorders(ctx)
-  drawPlayerPaddle(ctx, gameState.Player1)
-  drawPlayerPaddle(ctx, gameState.Player2)
+  drawPlayerPaddle(ctx, gameState.Player1, gameState.KeyPads)
+  drawPlayerPaddle(ctx, gameState.Player2, gameState.KeyPads)
   drawBall(ctx, gameState.Ball)
   drawStats(ctx, gameState, currentFps)
 
